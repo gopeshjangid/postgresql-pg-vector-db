@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    build: .
+    container_name: postgre-connection-db-1
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Tiger123 # Use a strong password in production!
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - .:/app # Mounts your current directory (Z:\postgre-connection) to /app inside the container
+    restart: always
+
+volumes:
+  pgdata:
