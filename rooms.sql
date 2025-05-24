@@ -10,7 +10,7 @@ CREATE TABLE rooms (
     -- If this 'connection_id' is intended to be a foreign key to the 'connections' table,
     -- the 'connections' table would need a UUID column for this purpose, or 'connections.id'
     -- would need to be a UUID itself. For now, it's a UUID column without a direct FK to 'connections.id'.
-    connection_id UUID NOT NULL,
+    connection_id UUID DEFAULT gen_random_uuid(),
 
     last_message TEXT, -- Stores the last message in the chat room (nullable)
     last_sender_id UUID, -- The ID of the user who sent the last message (nullable)
