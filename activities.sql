@@ -4,20 +4,15 @@ DROP TABLE IF EXISTS activities CASCADE;
 -- Create the activities table
 CREATE TABLE activities (
     id SERIAL PRIMARY KEY, -- Maps to MongoDB's _id, auto-incrementing integer
-    connection_id UUID,    -- Assuming connectionId is a UUID string. Use VARCHAR(255) if not strictly UUID.
-    type VARCHAR(255),     -- Stores the activity type (e.g., 'ACTIVITY')
+    connection_id UUID,     -- Assuming connectionId is a UUID string. Use VARCHAR(255) if not strictly UUID.
+    type VARCHAR(255),      -- Stores the activity type (e.g., 'ACTIVITY')
     image_url JSONB DEFAULT '[]'::jsonb, -- Stores an array of image URLs/objects. JSONB is flexible.
-    mood VARCHAR(255),     -- Stores the mood (e.g., 'HAPPY')
-    author_id UUID,        -- Assuming author is a UUID string (likely referencing a user ID). Use VARCHAR(255) if not strictly UUID.
+    mood VARCHAR(255),      -- Stores the mood (e.g., 'HAPPY')
+    author_id UUID,         -- Assuming author is a UUID string (likely referencing a user ID). Use VARCHAR(255) if not strictly UUID.
     reactions JSONB DEFAULT '[]'::jsonb, -- Stores an array of reaction objects/data. JSONB is flexible.
     stickers JSONB DEFAULT '[]'::jsonb, -- Stores an array of sticker objects/data. JSONB is flexible.
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores creation timestamp
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,  -- Stores last update timestamp
-
-    -- Add a FOREIGN KEY constraint to link author_id to users.user_id
-    -- ON DELETE CASCADE means if a user is deleted, all their activities will also be deleted.
-    -- Consider ON DELETE RESTRICT or SET NULL based on your application's logic.
-    FOREIGN KEY (author_id) REFERENCES users (user_id) ON DELETE CASCADE
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- REMOVED TRAILING COMMA HERE
 );
 
 -- Optional: Add indexes for frequently queried columns to improve performance

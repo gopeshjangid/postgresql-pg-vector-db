@@ -3,8 +3,8 @@ DROP TABLE IF EXISTS rooms CASCADE;
 -- Create the rooms table
 CREATE TABLE rooms (
     id SERIAL PRIMARY KEY, -- Maps to MongoDB's _id, auto-incrementing integer
-    user_id UUID NOT NULL, -- The ID of the first user in the room
-    connection_user_id UUID NOT NULL, -- The ID of the second user in the room
+    user_id VARCHAR(225), -- The ID of the first user in the room
+    connection_user_id VARCHAR(225), -- The ID of the second user in the room
 
     -- connection_id is a UUID in MongoDB. Note that your 'connections' table's PRIMARY KEY 'id' is SERIAL.
     -- If this 'connection_id' is intended to be a foreign key to the 'connections' table,
@@ -17,14 +17,10 @@ CREATE TABLE rooms (
     last_message_type VARCHAR(255), -- Type of the last message (e.g., 'TEXT', 'IMAGE') (nullable)
     status VARCHAR(255) NOT NULL, -- Status of the room (e.g., 'active', 'archived')
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores creation timestamp
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,  -- Stores last update timestamp
-
-    -- Add FOREIGN KEY constraints to link user_id, connection_user_id, and last_sender_id to users.user_id
-    -- ON DELETE CASCADE: If a user is deleted, associated room records will also be deleted.
-    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
-   
-    -- Add a unique constraint to ensure only one room exists between any two users, regardless of order
-    CONSTRAINT unique_room_pair UNIQUE (LEAST(user_id, connection_user_id), GREATEST(user_id, connection_user_id))
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- REMOVED TRAILING COMMA HERE
+    -- If you intend to have a unique constraint on user_id and connection_user_id,
+    -- you would add it here, for example:
+    -- , CONSTRAINT unique_room_pair UNIQUE (LEAST(user_id, connection_user_id), GREATEST(user_id, connection_user_id))
 );
 
 -- Optional: Add indexes for frequently queried columns to improve performance

@@ -1,8 +1,8 @@
 -- First, ensure you have the necessary extensions installed and enabled in your database:
 -- This requires installing the PostGIS and pgvector packages on your EC2 instance
 -- and then enabling them within your specific database using these commands:
--- CREATE EXTENSION postgis;
--- CREATE EXTENSION vector;
+CREATE EXTENSION postgis; -- UNCOMMENTED: Essential for GEOMETRY type
+CREATE EXTENSION vector;  -- UNCOMMENTED: Essential for VECTOR type
 DROP TABLE IF EXISTS users CASCADE;
 -- Create the users table
 CREATE TABLE users (
@@ -34,14 +34,11 @@ CREATE TABLE users (
     looking_for VARCHAR(255),
 
     -- Account Status (Consider using an ENUM type for stricter values)
-   
+
     -- Embedding Vectors (Requires pgvector)
     -- You need to specify the dimension of your vectors (e.g., 1536 for OpenAI embeddings)
     profile_embedding VECTOR(1024), -- Replace 1536 with your actual vector dimension
-    wanted_embedding VECTOR(1024), -- Replace 1536 with your actual vector dimension
-
-    -- Timestamps (Common practice in SQL databases)
-   
+    wanted_embedding VECTOR(1024) -- REMOVED TRAILING COMMA: This was the cause of the syntax error
 );
 
 -- Add indexes based on your Mongoose schema definitions
@@ -80,4 +77,3 @@ WHERE account_status = 'ACTIVE';
 -- Example HNSW index (often preferred for search performance):
 CREATE INDEX users_profile_embedding_hnsw ON users USING hnsw (profile_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 CREATE INDEX users_wanted_embedding_hnsw ON users USING hnsw (wanted_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
-
