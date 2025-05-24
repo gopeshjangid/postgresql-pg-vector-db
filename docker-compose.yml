@@ -1,19 +1,24 @@
-version: '3.8'
-
+# ── Remove the obsolete “version:” key ──
 services:
   db:
-    build: .
-    container_name: postgre-connection-db-1
+    image: postgres:15-alpine    # slimmer official image; no need to maintain a Dockerfile
+    container_name: postgresql-db
+    restart: unless-stopped      # more precise than “always”
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: Tiger123 # Use a strong password in production!
-      POSTGRES_DB: postgres
+      # load creds from an .env file (see next)
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+      POSTGRES_DB:        ${POSTGRES_DB}
+      PGDATA:             /var/lib/postgresql/data/pgdata  # explicit data dir
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - .:/app # Mounts your current directory (Z:\postgre-connection) to /app inside the container
-    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
