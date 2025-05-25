@@ -1,25 +1,66 @@
-# ── Remove the obsolete “version:” key ──
+volumes:
+  postgres_data: # Define a named volume
+
 services:
   db:
-    image: postgres:15-alpine    # slimmer official image; no need to maintain a Dockerfile
+    build: .
     container_name: postgresql-db
-    restart: unless-stopped      # more precise than “always”
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      # load creds from an .env file (see next)
-      POSTGRES_USER:      ${POSTGRES_USER}
-      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
-      POSTGRES_DB:        ${POSTGRES_DB}
-      PGDATA:             /var/lib/postgresql/data/pgdata  # explicit data dir
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata # This path inside the container is fine
     volumes:
-      - /home/ubuntu/postgres-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data # Using the named volume for local development
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-volumes:
-  pgdata:
-    driver: local
+  # Service to initialize the database with multiple scripts
+  db-initializer:
+    image: postgis/postgis:16-3.4 # Use the same image as db for psql client compatibility
+    container_name: postgresql-initializer
+    depends_on:
+      db:
+        condition: service_healthy # Ensures 'db' service is healthy before running
+    volumes:
+      # Mount all your SQL scripts into the container
+      - ./create_users_table.sql:/app/create_users_table.sql
+      - ./activities.sql:/app/activities.sql
+      - ./rooms.sql:/app/rooms.sql
+      - ./connections.sql:/app/connections.sql
+    environment:
+      # Pass the same environment variables for psql to connect
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGPASSWORD: ${POSTGRES_PASSWORD} # Essential for psql authentication
+    command: >
+      sh -c "
+        echo 'Waiting for database to be ready...' &&
+        until pg_isready -h db -U $POSTGRES_USER -d $POSTGRES_DB; do
+          sleep 1;
+        done;
+        echo 'Database is ready. Running SQL scripts...';
+
+        # Execute each SQL script sequentially
+        psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /app/create_users_table.sql || exit 1;
+        echo 'create_users_table.sql executed.';
+
+        psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /app/activities.sql || exit 1;
+        echo 'activities.sql executed.';
+
+        psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /app/rooms.sql || exit 1;
+        echo 'rooms.sql executed.';
+
+        psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /app/connections.sql || exit 1;
+        echo 'connections.sql executed.';
+
+        echo 'All SQL scripts executed successfully.';
+      "
+    restart: "no" # This service should run once and then exit
