@@ -10,6 +10,7 @@ CREATE TABLE activities (
     mood VARCHAR(255),      -- Stores the mood (e.g., 'HAPPY')
     author_id VARCHAR(255),         -- Assuming author is a UUID string (likely referencing a user ID). Use VARCHAR(255) if not strictly UUID.
     caption VARCHAR(255), 
+    status VARCHAR(255), 
     reactions JSONB DEFAULT '[]'::jsonb, -- Stores an array of reaction objects/data. JSONB is flexible.
     stickers JSONB DEFAULT '[]'::jsonb, -- Stores an array of sticker objects/data. JSONB is flexible.
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores creation timestamp
