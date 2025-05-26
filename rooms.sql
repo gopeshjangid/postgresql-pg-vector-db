@@ -11,9 +11,12 @@ CREATE TABLE rooms (
     -- the 'connections' table would need a UUID column for this purpose, or 'connections.id'
     -- would need to be a UUID itself. For now, it's a UUID column without a direct FK to 'connections.id'.
     connection_id UUID DEFAULT gen_random_uuid(),
-
+    last_message_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores the timestamp of the last message
+    user_full_name VARCHAR(225), -- Full name of the user in the room (nullable)
+    user_profile_image VARCHAR(225), -- Profile image URL of the user in the room (nullable)
+    last_message_unread_count INTEGER DEFAULT 0, -- Stores the count of unread messages in the chat room
     last_message TEXT, -- Stores the last message in the chat room (nullable)
-    last_sender_id UUID, -- The ID of the user who sent the last message (nullable)
+    last_sender_id VARCHAR(225), -- The ID of the user who sent the last message (nullable)
     last_message_type VARCHAR(255), -- Type of the last message (e.g., 'TEXT', 'IMAGE') (nullable)
     status VARCHAR(255) NOT NULL, -- Status of the room (e.g., 'active', 'archived')
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores creation timestamp
