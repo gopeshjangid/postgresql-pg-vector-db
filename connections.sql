@@ -7,7 +7,7 @@ CREATE TABLE connections (
     connection_id VARCHAR(225), -- Stores an array of blocked user IDs within this connection (if applicable)
     status VARCHAR(255), -- Status of the connection (e.g., 'ACTIVE', 'PENDING', 'BLOCKED')
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores creation timestamp
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- Correct: No trailing comma
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Correct: No trailing comma
     profile_image VARCHAR(225),
     full_name VARCHAR(225) -- Profile image URL of the user in the connection (nullable)
 );
