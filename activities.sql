@@ -3,12 +3,12 @@ DROP TABLE IF EXISTS activities CASCADE;
 
 -- Create the activities table
 CREATE TABLE activities (
-    id SERIAL PRIMARY KEY, -- Maps to MongoDB's _id, auto-incrementing integer
-    connection_id UUID,     -- Assuming connectionId is a UUID string. Use VARCHAR(255) if not strictly UUID.
+    activity_id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Maps to MongoDB's _id, auto-incrementing integer
+    connection_user_id UUID,     -- Assuming connectionId is a UUID string. Use VARCHAR(255) if not strictly UUID.
     type VARCHAR(255),      -- Stores the activity type (e.g., 'ACTIVITY')
     image_url JSONB DEFAULT '[]'::jsonb, -- Stores an array of image URLs/objects. JSONB is flexible.
     mood VARCHAR(255),      -- Stores the mood (e.g., 'HAPPY')
-    author_id VARCHAR(255),  
+    author_id UUID,  
     caption VARCHAR(225) , 
     author_full_name VARCHAR(225),
     author_profile_image VARCHAR(225),  -- Assuming author is a UUID string (likely referencing a user ID). Use VARCHAR(255) if not strictly UUID.
@@ -20,8 +20,10 @@ CREATE TABLE activities (
 
 -- Optional: Add indexes for frequently queried columns to improve performance
 -- For example, if you often query by connection_id, author_id, or type:
-CREATE INDEX idx_activities_connection_id ON activities (connection_id);
+CREATE INDEX idx_activities_connection_user_id ON activities (connection_user_id);
 CREATE INDEX idx_activities_author_id ON activities (author_id);
+CREATE INDEX idx_activities_activity_id ON activities (activity_id);
+
 CREATE INDEX idx_activities_type ON activities (type);
 CREATE INDEX idx_activities_created_at ON activities (created_at DESC); -- For chronological queries
 

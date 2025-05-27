@@ -7,12 +7,11 @@ DROP TABLE IF EXISTS users CASCADE;
 -- Create the users table
 CREATE TABLE users (
     -- Basic User Information
-    id SERIAL PRIMARY KEY, -- Auto-incrementing primary key
+    user_id UUID PRIMARY KEY, -- Auto-incrementing primary key
     email VARCHAR(255) UNIQUE, -- Add UNIQUE constraint for emails
     full_name VARCHAR(255),
     date_of_birth DATE, -- Storing as TEXT to match Mongoose, consider DATE or TIMESTAMP if format is consistent
     gender VARCHAR(50),
-    user_id VARCHAR(255) UNIQUE, -- Add UNIQUE constraint for user_id
     bio TEXT, -- Use TEXT for potentially longer strings
     profile_image TEXT, -- URL or key to the image
 
