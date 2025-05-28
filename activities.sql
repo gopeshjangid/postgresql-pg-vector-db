@@ -1,29 +1,23 @@
-
--- Create the activities table
+-- Create the activities table with camelCase column names
 CREATE TABLE activities (
-    activity_id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Maps to MongoDB's _id, auto-incrementing integer
-    connection_user_id UUID,     -- Assuming connectionId is a UUID string. Use VARCHAR(255) if not strictly UUID.
-    type VARCHAR(255),      -- Stores the activity type (e.g., 'ACTIVITY')
-    image_url JSONB DEFAULT '[]'::jsonb, -- Stores an array of image URLs/objects. JSONB is flexible.
-    mood VARCHAR(255),      -- Stores the mood (e.g., 'HAPPY')
-    author_id UUID,  
-    caption VARCHAR(225) , 
-    author_full_name VARCHAR(225),
-    author_profile_image VARCHAR(225),  -- Assuming author is a UUID string (likely referencing a user ID). Use VARCHAR(255) if not strictly UUID.
-    reactions JSONB DEFAULT '[]'::jsonb, -- Stores an array of reaction objects/data. JSONB is flexible.
-    stickers JSONB DEFAULT '[]'::jsonb, -- Stores an array of sticker objects/data. JSONB is flexible.
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Stores creation timestamp
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- REMOVED TRAILING COMMA HERE
+    activityId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    connectionUserId UUID,                -- Reference to the related connection
+    type VARCHAR(255),                    -- Activity type (e.g., 'ACTIVITY')
+    imageUrl JSONB DEFAULT '[]'::JSONB,   -- Array of image URLs/objects
+    mood VARCHAR(255),                    -- Mood (e.g., 'HAPPY')
+    authorId UUID,                        -- ID of the authoring user
+    caption VARCHAR(225),
+    authorFullName VARCHAR(225),
+    authorProfileImage VARCHAR(225),
+    reactions JSONB DEFAULT '[]'::JSONB,  -- Array of reaction objects
+    stickers JSONB DEFAULT '[]'::JSONB,   -- Array of sticker objects
+    createdAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Optional: Add indexes for frequently queried columns to improve performance
--- For example, if you often query by connection_id, author_id, or type:
-CREATE INDEX idx_activities_connection_user_id ON activities (connection_user_id);
-CREATE INDEX idx_activities_author_id ON activities (author_id);
-CREATE INDEX idx_activities_activity_id ON activities (activity_id);
-
+-- Indexes for performance
+CREATE INDEX idx_activities_connectionUserId ON activities (connectionUserId);
+CREATE INDEX idx_activities_authorId ON activities (authorId);
+CREATE INDEX idx_activities_activityId ON activities (activityId);
 CREATE INDEX idx_activities_type ON activities (type);
-CREATE INDEX idx_activities_created_at ON activities (created_at DESC); -- For chronological queries
-
--- Note: The '__v' field from MongoDB is a version key specific to Mongoose/MongoDB
--- and is generally not replicated in a relational database schema.
+CREATE INDEX idx_activities_createdAt ON activities (createdAt DESC);

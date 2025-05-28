@@ -1,77 +1,59 @@
--- First, ensure you have the necessary extensions installed and enabled in your database:
--- This requires installing the PostGIS and pgvector packages on your EC2 instance
--- and then enabling them within your specific database using these commands:
-CREATE EXTENSION postgis; -- UNCOMMENTED: Essential for GEOMETRY type
-CREATE EXTENSION vector;  -- UNCOMMENTED: Essential for VECTOR type
--- Create the users table
+-- First, ensure required extensions are enabled
+DROP TABLE IF EXISTS users CASCADE;
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Create the users table with camelCase column names
 CREATE TABLE users (
-    -- Basic User Information
-    user_id UUID PRIMARY KEY, -- Auto-incrementing primary key
-    email VARCHAR(255) UNIQUE, -- Add UNIQUE constraint for emails
-    full_name VARCHAR(255),
-    date_of_birth DATE, -- Storing as TEXT to match Mongoose, consider DATE or TIMESTAMP if format is consistent
+    userId UUID PRIMARY KEY,                      -- Primary key
+    email VARCHAR(255) UNIQUE,                    -- Unique email
+    fullName VARCHAR(255),
+    dateOfBirth DATE,
     gender VARCHAR(50),
-    bio TEXT, -- Use TEXT for potentially longer strings
-    profile_image TEXT, -- URL or key to the image
+    bio TEXT,
+    profileImage TEXT,
 
-    -- Other Images (Stored as JSONB array)
-    other_images JSONB DEFAULT '[]'::JSONB, -- Array of { location: string, key: string } objects
+    otherImages JSONB DEFAULT '[]'::JSONB,        -- Array of images
 
-    -- Location Information (Requires PostGIS)
-    -- GEOMETRY(Point, 4326) stores the latitude and longitude
-    location_point GEOMETRY(Point, 4326), -- SRID 4326 for WGS 84
-    location_pincode INTEGER,
-    location_city VARCHAR(255),
-    location_state VARCHAR(255),
-    location_address TEXT,
-    account_status VARCHAR(50) DEFAULT 'ACTIVE',
-    -- Interests (Stored as PostgreSQL array)
-    interests TEXT[] DEFAULT '{}', -- Array of strings
+    locationPoint GEOMETRY(Point, 4326),          -- PostGIS point
+    locationPincode INTEGER,
+    locationCity VARCHAR(255),
+    locationState VARCHAR(255),
+    locationAddress TEXT,
 
-    -- Looking For
-    looking_for VARCHAR(255),
+    accountStatus VARCHAR(50) DEFAULT 'ACTIVE',
 
-    -- Account Status (Consider using an ENUM type for stricter values)
+    interests TEXT[] DEFAULT '{}',                -- Array of strings
 
-    -- Embedding Vectors (Requires pgvector)
-    -- You need to specify the dimension of your vectors (e.g., 1536 for OpenAI embeddings)
-    profile_embedding VECTOR(1024), -- Replace 1536 with your actual vector dimension
-    wanted_embedding VECTOR(1024) -- REMOVED TRAILING COMMA: This was the cause of the syntax error
+    lookingFor VARCHAR(255),
+
+    profileEmbedding VECTOR(1024),
+    wantedEmbedding VECTOR(1024)
 );
 
--- Add indexes based on your Mongoose schema definitions
+-- Geospatial index on locationPoint
+CREATE INDEX users_locationPoint_gist ON users USING GIST (locationPoint);
 
--- Geospatial index on location_point (Requires PostGIS)
-CREATE INDEX users_location_point_gist ON users USING GIST (location_point);
+-- B-tree index on fullName
+CREATE INDEX users_fullName_idx ON users (fullName);
 
--- Standard B-tree index on full_name
-CREATE INDEX users_full_name_idx ON users (full_name);
+-- GIN index on interests for array membership queries
+CREATE INDEX users_interests_gin ON users USING GIN (interests);
 
--- Compound index for common filters: gender, looking_for, and interests
--- Indexing array columns directly might have limitations depending on query patterns.
--- Consider using a GIN index on the interests column if you frequently query for specific interests within the array.
-CREATE INDEX users_gender_looking_for_interests_idx ON users (gender, looking_for, interests);
+-- Compound B-tree index on gender, lookingFor, and dateOfBirth
+CREATE INDEX users_gender_lookingFor_dob_idx
+  ON users (gender, lookingFor, dateOfBirth);
 
--- Separate index on date_of_birth
-CREATE INDEX users_date_of_birth_idx ON users (date_of_birth);
+-- Partial index for active users
+CREATE INDEX users_active_filter_idx
+  ON users (gender, lookingFor, dateOfBirth)
+  WHERE accountStatus = 'ACTIVE';
 
+-- HNSW vector indexes (pgvector)
+CREATE INDEX users_profileEmbedding_hnsw
+  ON users USING hnsw (profileEmbedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
 
--- Partial index for active users only
--- Note: The partial index condition is based on SQL syntax, not MongoDB syntax
-CREATE INDEX users_active_filter_idx ON users (gender, looking_for, interests, date_of_birth)
-WHERE account_status = 'ACTIVE';
-
-
--- Indexes for pgvector columns (Requires pgvector)
--- Choose the appropriate index type (IVFFlat or HNSW) based on your needs (indexing speed vs. query performance/recall)
--- Replace 1536 with your actual vector dimension and adjust parameters (lists, m, ef_construction) as needed.
--- Use the correct operator class (vector_cosine_ops, vector_l2_ops, vector_inner_product_ops)
--- based on your embedding model's similarity metric.
-
--- Example IVFFlat index:
--- CREATE INDEX users_profile_embedding_ivf ON users USING ivfflat (profile_embedding vector_cosine_ops) WITH (lists = 100);
--- CREATE INDEX users_wanted_embedding_ivf ON users USING ivfflat (wanted_embedding vector_cosine_ops) WITH (lists = 100);
-
--- Example HNSW index (often preferred for search performance):
-CREATE INDEX users_profile_embedding_hnsw ON users USING hnsw (profile_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
-CREATE INDEX users_wanted_embedding_hnsw ON users USING hnsw (wanted_embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+CREATE INDEX users_wantedEmbedding_hnsw
+  ON users USING hnsw (wantedEmbedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
