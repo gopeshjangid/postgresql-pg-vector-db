@@ -1,18 +1,19 @@
 -- Create the activities table with camelCase column names
+DROP TABLE IF EXISTS activities CASCADE;
 CREATE TABLE activities (
-    activityId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    connectionUserId UUID,                -- Reference to the related connection
+    "activityId" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "connectionUserId" UUID,                -- Reference to the related connection
     type VARCHAR(255),                    -- Activity type (e.g., 'ACTIVITY')
-    imageUrl JSONB DEFAULT '[]'::JSONB,   -- Array of image URLs/objects
+    "imageUrl" JSONB DEFAULT '[]'::JSONB,   -- Array of image URLs/objects
     mood VARCHAR(255),                    -- Mood (e.g., 'HAPPY')
-    authorId UUID,                        -- ID of the authoring user
+    "authorId" UUID,                        -- ID of the authoring user
     caption VARCHAR(225),
-    authorFullName VARCHAR(225),
-    authorProfileImage VARCHAR(225),
+    "authorFullName" VARCHAR(225),
+    "authorProfileImage" VARCHAR(225),
     reactions JSONB DEFAULT '[]'::JSONB,  -- Array of reaction objects
     stickers JSONB DEFAULT '[]'::JSONB,   -- Array of sticker objects
-    createdAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes for performance

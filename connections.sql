@@ -1,15 +1,15 @@
 -- Create the connections table with camelCase column names
 DROP TABLE IF EXISTS connections CASCADE;
 CREATE TABLE connections (
-    connectionId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    userId UUID NOT NULL,
-    connectionUserId UUID NOT NULL,
-    blockedUsers JSONB DEFAULT '[]'::jsonb,
+    "connectionId" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
+    "connectionUserId" UUID NOT NULL,
+    "blockedUsers" JSONB DEFAULT '[]'::jsonb,
     status VARCHAR(255),
-    createdAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    profileImage VARCHAR(255),
-    fullName VARCHAR(255)
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "profileImage" VARCHAR(255),
+    "fullName" VARCHAR(255)
 );
 
 -- Indexes for performance optimization
