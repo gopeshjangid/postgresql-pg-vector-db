@@ -3,7 +3,6 @@
 -- and then enabling them within your specific database using these commands:
 CREATE EXTENSION postgis; -- UNCOMMENTED: Essential for GEOMETRY type
 CREATE EXTENSION vector;  -- UNCOMMENTED: Essential for VECTOR type
-DROP TABLE IF EXISTS users CASCADE;
 -- Create the users table
 CREATE TABLE users (
     -- Basic User Information

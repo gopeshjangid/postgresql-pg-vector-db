@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS rooms CASCADE;
-
 -- Create the rooms table
 CREATE TABLE rooms (
     room_id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Maps to MongoDB's _id, auto-incrementing integer

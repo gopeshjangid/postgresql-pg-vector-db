@@ -1,5 +1,3 @@
--- Drop the existing activities table if it exists to allow recreation
-DROP TABLE IF EXISTS activities CASCADE;
 
 -- Create the activities table
 CREATE TABLE activities (

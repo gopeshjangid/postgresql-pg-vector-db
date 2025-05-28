@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS connections CASCADE;
 
 CREATE TABLE connections (
     connection_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
