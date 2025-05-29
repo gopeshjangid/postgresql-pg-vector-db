@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Create the users table with camelCase column names
 CREATE TABLE users (
     "userId" UUID PRIMARY KEY,                      -- Primary key
-    email VARCHAR(255) UNIQUE,                    -- Unique email
+    email VARCHAR(255),                    -- Unique email
     "fullName" VARCHAR(255),
     "dateOfBirth" DATE,
     gender VARCHAR(50),
