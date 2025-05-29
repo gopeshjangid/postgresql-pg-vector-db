@@ -8,6 +8,7 @@ CREATE TABLE activities (
     mood VARCHAR(255),                    -- Mood (e.g., 'HAPPY')
     "authorId" UUID,                        -- ID of the authoring user
     caption VARCHAR(225),
+    status VARCHAR(225),
     "authorFullName" VARCHAR(225),
     "authorProfileImage" VARCHAR(225),
     reactions JSONB DEFAULT '[]'::JSONB,  -- Array of reaction objects
