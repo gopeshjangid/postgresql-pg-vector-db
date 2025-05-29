@@ -1,5 +1,4 @@
 -- Create the rooms table with camelCase column names
-DROP TABLE IF EXISTS rooms CASCADE;
 CREATE TABLE rooms (
     "chatId" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "userId" UUID,                      -- The ID of the first user in the room

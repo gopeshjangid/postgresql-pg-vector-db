@@ -1,5 +1,4 @@
 -- Create the connections table with camelCase column names
-DROP TABLE IF EXISTS connections CASCADE;
 CREATE TABLE connections (
     "connectionId" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "userId" UUID NOT NULL,

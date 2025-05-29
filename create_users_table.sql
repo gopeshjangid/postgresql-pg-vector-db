@@ -1,5 +1,4 @@
 -- First, ensure required extensions are enabled
-DROP TABLE IF EXISTS users CASCADE;
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS vector;
 

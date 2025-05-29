@@ -1,5 +1,4 @@
 -- Create the activities table with camelCase column names
-DROP TABLE IF EXISTS activities CASCADE;
 CREATE TABLE activities (
     "activityId" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "connectionUserId" UUID,                -- Reference to the related connection
