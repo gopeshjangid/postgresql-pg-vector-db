@@ -19,7 +19,7 @@ CREATE TABLE users (
     "locationCity" VARCHAR(255),
     "locationState" VARCHAR(255),
     "locationAddress" TEXT,
-    "profileCompliments" TEXT[];
+    "profileCompliments" TEXT[] DEFAULT '{}',
     "accountStatus" VARCHAR(50) DEFAULT 'ACTIVE',
 
     interests TEXT[] DEFAULT '{}',                -- Array of strings
